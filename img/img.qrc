@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/KeywordManager">
+        <file>abc_icon.png</file>
+        <file>document_user.png</file>
+        <file>plus_icon.png</file>
+        <file>recycle_bin.png</file>
+    </qresource>
+</RCC>
