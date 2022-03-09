@@ -9,20 +9,37 @@
 #include <QIcon>
 #include <QPixmap>
 #include <memory>
+#include <random>
+#include <QPalette>
+#include <QVariant>
+#include "clicklabel.h"
 
 using std::unique_ptr;
 using std::make_unique;
 using std::move;
+using std::random_device;
+using std::default_random_engine;
+using std::uniform_int_distribution;
 
 class KeywordTableModel : public QAbstractTableModel
 {
+	Q_DECLARE_METATYPE(QLabel*);
+
     QList<QMap<int, unique_ptr<QWidget>>> mapLabel;
     unique_ptr<QIcon> recycleBinIcon;
     unique_ptr<QPixmap> recycleBinPixmap;
     static QColor stdColors;
-    static QVector<int> colorList = { stdColors.blue(), stdColors.red(), stdColors.green(),
+	static const QVector<int> colorList = { stdColors.blue(), stdColors.red(), stdColors.green(),
                                       stdColors.yellow(), stdColors.cyan(), stdColors.magenta(),
                                       stdColors.black() };
+	unique_ptr<QIcon> documentUser;
+	QStack<unique_ptr<QPalette> stackPal;
+	QString newListText;
+	unique_ptr<QLabel> exportListLabel;
+	unique_ptr<QLabel> importListLabel;
+	unique_ptr<ClickLabel> clickLabel;
+	unique_ptr<QLabel> plusLabel;
+	QPixmap plusPixmap;
 public:
     KeywordTableModel();
     KeywordTableModel(const QList<QMap<int, unique_ptr<QWidget>>>& that) = delete;
@@ -31,7 +48,13 @@ public:
     virtual int columnCount(const QModelIndex &parent = QModelIndex());
     virtual bool insertRows(int row, int count, const QModelIndex& parent = QModelIndex());
     virtual bool insertColumns(int row, int count, const QModelIndex& parent = QModelIndex());
-
+	virtual bool removeRows(int row, int count, const QModelIndex& parent = QModelIndex());
+	virtual bool removeColumns(int row, int count, const QModelIndex& parent = QModelIndex());
+	virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+	virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+	virtual bool setData(const QModelIndex& index, const QVariant& value, int role);
+	virtual Qt::ItemFlags flags(const QModelIndex& index) const;
+	virtual ~KeywordTableModel();
 };
 
 #endif // KEYWORDTABLEMODEL_H

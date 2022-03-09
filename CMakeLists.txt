@@ -21,6 +21,8 @@ set(PROJECT_SOURCES
         img/img.qrc
         keywordtablemodel.h
         keywordtablemodel.cpp
+		clicklabel.h
+		clicklabel.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
