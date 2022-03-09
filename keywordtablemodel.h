@@ -12,6 +12,7 @@
 #include <random>
 #include <QPalette>
 #include <QVariant>
+#include <QStack>
 #include "clicklabel.h"
 
 using std::unique_ptr;
@@ -21,19 +22,17 @@ using std::random_device;
 using std::default_random_engine;
 using std::uniform_int_distribution;
 
+Q_DECLARE_METATYPE(QLabel*);
+
 class KeywordTableModel : public QAbstractTableModel
 {
-	Q_DECLARE_METATYPE(QLabel*);
-
-    QList<QMap<int, unique_ptr<QWidget>>> mapLabel;
+    QList<QMap<int, unique_ptr<QLabel>>> mapLabel;
     unique_ptr<QIcon> recycleBinIcon;
     unique_ptr<QPixmap> recycleBinPixmap;
     static QColor stdColors;
-	static const QVector<int> colorList = { stdColors.blue(), stdColors.red(), stdColors.green(),
-                                      stdColors.yellow(), stdColors.cyan(), stdColors.magenta(),
-                                      stdColors.black() };
+    static const QVector<int> colorList;
 	unique_ptr<QIcon> documentUser;
-	QStack<unique_ptr<QPalette> stackPal;
+    QStack<unique_ptr<QPalette>> stackPal;
 	QString newListText;
 	unique_ptr<QLabel> exportListLabel;
 	unique_ptr<QLabel> importListLabel;
@@ -42,8 +41,8 @@ class KeywordTableModel : public QAbstractTableModel
 	QPixmap plusPixmap;
 public:
     KeywordTableModel();
-    KeywordTableModel(const QList<QMap<int, unique_ptr<QWidget>>>& that) = delete;
-    KeywordTableModel(QList<QMap<int, unique_ptr<QWidget>>>&& that) noexcept;
+    //KeywordTableModel(const QList<QMap<int, unique_ptr<QLabel>>>& that) = delete;
+    //KeywordTableModel(QList<QMap<int, unique_ptr<QLabel>>>&& that) noexcept;
     virtual int rowCount(const QModelIndex &parent = QModelIndex());
     virtual int columnCount(const QModelIndex &parent = QModelIndex());
     virtual bool insertRows(int row, int count, const QModelIndex& parent = QModelIndex());

@@ -1,9 +1,9 @@
 #include "clicklabel.h"
 
 
-explicit ClickLabel::ClickLabel(const QString& text = QString(), QWidget* parent = nullptr) : QLabel(parent) { setText(text); }
+ClickLabel::ClickLabel(const QString& text, QWidget* parent) : QLabel(parent) { setText(text); }
 
-ClickLabel::~ClickLabel();
+ClickLabel::~ClickLabel() { }
 
 void ClickLabel::clicked() { ; }
 
