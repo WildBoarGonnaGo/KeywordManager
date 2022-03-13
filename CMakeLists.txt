@@ -13,14 +13,17 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets REQUIRED)
+add_compile_options(-v -g)
 
 set(PROJECT_SOURCES
         main.cpp
         mainwindow.cpp
         mainwindow.h
         img/img.qrc
-        keywordtablemodel.h
-        keywordtablemodel.cpp
+        # keywordtablemodel.h
+        # keywordtablemodel.cpp
+        keywordlistwidget.h
+        keywordlistwidget.cpp
 		clicklabel.h
 		clicklabel.cpp
 )

@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QWidget>
+#include <QPixmap>
 #include <QIcon>
 #include <QMap>
 #include <QVariant>
@@ -9,30 +10,21 @@
 #include <QList>
 #include <QImage>
 #include <QLabel>
-#include <QTableView>
-#include "keywordtablemodel.h"
+//#include "keywordtablemodel.h"
+#include "keywordlistwidget.h"
 
 using std::unique_ptr;
 using std::make_unique;
 using std::make_shared;
-using std::shared_ptr;
-using std::move;
 
 class MainWindow : public QWidget {
 
     Q_OBJECT;
 
-    unique_ptr<QIcon> icon;
-    //unique_ptr<QStandardItemModel> stdItemModel;
-    unique_ptr<QIcon> user_document_icon;
-    shared_ptr<QIcon> plus_icon;
-    //QList<QMap<QString, QVariant>> list;
-    //QListWidget listWidget;
-    //unique_ptr<QStandardItem> plusIconItem;
-    //unique_ptr<QStandardItem> plusTextItem;
-    //unique_ptr<QLabel> addLink;
-    unique_ptr<QTableView> tableView;
-    unique_ptr<KeywordTableModel> keywordTableModel;
+    unique_ptr<QPixmap> abcPixmap;
+    unique_ptr<QIcon> abcIcon;
+    unique_ptr<KeywordListWidget> keywordListWidget;
+    unique_ptr<QVBoxLayout> mainVBox;
 public:
     MainWindow(QWidget *widget = nullptr);
     void addList(const QMap<QString, QVariant>& item);

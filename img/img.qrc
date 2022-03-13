@@ -6,5 +6,6 @@
         <file>recycle_bin.png</file>
         <file>export_list_icon.png</file>
         <file>import_list_icon.png</file>
+        <file>papers_icon.png</file>
     </qresource>
 </RCC>
