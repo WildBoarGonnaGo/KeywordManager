@@ -33,20 +33,19 @@ class KeywordListWidget : public QWidget
     unique_ptr<QLabel> plusLabel;
     unique_ptr<ClickLabel> addListLabel;
     unique_ptr<QPixmap> plusPixmap;
-    unique_ptr<QHBoxLayout> addListHBoxLayout;
     unique_ptr<QPixmap> documentUserPixmap;
     unique_ptr<QPixmap> recycleBinPixmap;
     unique_ptr<QLabel> recycleBinLabel;
-    unique_ptr<QLabel> documentUserLabel;
     list<unique_ptr<QWidget>> prohibUserList;
     list<unique_ptr<QListWidgetItem>> prohibUserListItem;
     QWidget* addListWidget;
-    list<unique_ptr<QHBoxLayout>> userProhibHBoxLayout;
+	list<unique_ptr<QHBoxLayout>> userProhibHBoxLayout;
     list<unique_ptr<QLabel>> userProhibLabel;
     list<unique_ptr<ClickLabel>> deleteLabelSquad;
     list<unique_ptr<QLabel>> colorBox;
     list<unique_ptr<QCheckBox>> checkBoxList;
     list<unique_ptr<QPalette>> paletteList;
+	list<unique_ptr<QLabel>> paperIconLabelList;
     random_device rDevice;
     default_random_engine rEngine;
     uniform_int_distribution<int> uniformRange;
@@ -54,9 +53,11 @@ class KeywordListWidget : public QWidget
 public:
     explicit KeywordListWidget(QWidget *parent = nullptr);
     void addNewProhibList();
+	void deleteProhibList(QLayout* layout, const int& count);
     virtual bool eventFilter(QObject* watcher, QEvent* event);
     ~KeywordListWidget();
-signals:
+public slots:
+	void showRecycleBin(ClickLabel& recycleBin);
 };
 
 #endif // KEYWORDLISTWIDGET_H
