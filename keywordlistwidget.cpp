@@ -4,8 +4,7 @@
 #include <QColor>
 #include <QDebug>
 #include <iostream>
-vector<int> KeywordListWidget::colorVector = { Qt::red, Qt::blue, Qt::yellow, Qt::cyan,
-                                               Qt::magenta, Qt::green, Qt::gray};
+vector<QString> KeywordListWidget::colorVector = { "red", "blue", "cyan", "magenta", "green", "yellow", "white" };
 
 KeywordListWidget::KeywordListWidget(QWidget *parent)
 {
@@ -22,7 +21,6 @@ KeywordListWidget::KeywordListWidget(QWidget *parent)
     checkBoxList = list<unique_ptr<QCheckBox>>();
     rEngine = default_random_engine(rDevice());
     uniformRange = uniform_int_distribution<int>(0, colorVector.size() - 1);
-    paletteList = list<unique_ptr<QPalette>>();
 	paperIconLabelList = list<unique_ptr<QLabel>>();
 	//addListWidget = nullptr;
 
@@ -84,13 +82,10 @@ bool KeywordListWidget::eventFilter(QObject* watcher, QEvent* event) {
 		if (!layoutSeek) continue;
 		int indexWidget = layoutSeek->indexOf(static_cast<QWidget*>(watcher));
 		if (indexWidget != -1 && event->type() == QEvent::MouseButtonPress) {
-			//ClickLabel* labelAddr = static_cast<ClickLabel*>(layoutSeek->itemAt(indexWidget)->widget());
-			qDebug() << "Recycle bin label clicked";
 			deleteProhibList(layoutSeek, i);
 			return true;
 		}
 	}
-	i = -1;
 	return false;
 }
 
@@ -99,7 +94,7 @@ void KeywordListWidget::addNewProhibList() {
 
     userProhibLabel.push_back(make_unique<QLabel>());
     userProhibLabel.back()->setTextInteractionFlags(Qt::TextEditorInteraction);
-	userProhibLabel.back()->setFixedWidth(300);
+    userProhibLabel.back()->setFixedWidth(380);
     userProhibLabel.back()->setText("cписок");
 
     checkBoxList.push_back(make_unique<QCheckBox>());
@@ -110,13 +105,11 @@ void KeywordListWidget::addNewProhibList() {
 	deleteLabelSquad.back()->installEventFilter(this);
 
     colorBox.push_back(make_unique<QLabel>());
-    paletteList.push_back(make_unique<QPalette>());
-    paletteList.back()->setColor(colorBox.back()->backgroundRole(), colorVector[rNumber]);
-    colorBox.back()->setPalette(*(paletteList.back()));
     colorBox.back()->resize(14, 14);
-	//colorBox.back()->setFrameShape(QFrame::Box);
+    colorBox.back()->setFrameShape(QFrame::Box);
     colorBox.back()->setAlignment(Qt::AlignCenter);
 	colorBox.back()->setAutoFillBackground(true);
+    colorBox.back()->setStyleSheet(QString("QLabel { background-color: %1 }").arg(colorVector[rNumber]));
 
 	paperIconLabelList.push_back(make_unique<QLabel>());
 	paperIconLabelList.back()->setPixmap(*documentUserPixmap);
@@ -130,7 +123,7 @@ void KeywordListWidget::addNewProhibList() {
     userProhibHBoxLayout.back()->setAlignment(userProhibLabel.back().get(), Qt::AlignLeft);
     userProhibHBoxLayout.back()->addWidget(deleteLabelSquad.back().get());
     userProhibHBoxLayout.back()->setAlignment(deleteLabelSquad.back().get(), Qt::AlignRight);
-	deleteLabelSquad.back()->setVisible(false);
+    deleteLabelSquad.back()->setVisible(true);
     userProhibHBoxLayout.back()->addWidget(colorBox.back().get());
     userProhibHBoxLayout.back()->addWidget(colorBox.back().get(), Qt::AlignRight);
 	userProhibHBoxLayout.back()->setAlignment(Qt::AlignLeft);
@@ -145,11 +138,28 @@ void KeywordListWidget::addNewProhibList() {
     listWidget->setItemWidget(prohibUserListItem.front().get(), prohibUserList.front().get());
 	listWidget->sortItems();
 
-	connect(listWidget.get(), SIGNAL(listWidget->itemEntered(prohibUserListItem.front().get())), SLOT(showRecycleBin(*(deleteLabelSquad.back()))));
+    connect(listWidget.get(), SIGNAL(listWidget->itemEntered(QListWidgetItem*)), SLOT(showRecycleBin(ClickLabel&)));
 }
 
 void KeywordListWidget::showRecycleBin(ClickLabel& recycleBin) {
-	recycleBin.setVisible(true);
+    qDebug() << "Eneterd list widget item";
+    for (int i = 0; i < listWidget->count() - 1; ++i) {
+          QListWidgetItem* widgetItemTmp = listWidget->item(i);
+          if (!widgetItemTmp) continue ;
+          QWidget *widgetSeek = listWidget->itemWidget(widgetItemTmp);
+          if (!widgetSeek) continue;
+          QLayout* layoutSeek = widgetSeek->layout();
+          if (!layoutSeek) continue;
+
+          list<unique_ptr<ClickLabel>>::iterator it = deleteLabelSquad.begin();
+          while (it != deleteLabelSquad.end()) {
+            ClickLabel* watch = it->get();
+            if (watch == static_cast<ClickLabel*>(layoutSeek->itemAt(4)->widget())) watch->setVisible(false);
+            else watch->setVisible(true);
+            ++it;
+          }
+    }
+
 }
 
 void KeywordListWidget::deleteProhibList(QLayout* layout, const int& count) {

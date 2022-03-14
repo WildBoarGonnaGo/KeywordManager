@@ -44,12 +44,11 @@ class KeywordListWidget : public QWidget
     list<unique_ptr<ClickLabel>> deleteLabelSquad;
     list<unique_ptr<QLabel>> colorBox;
     list<unique_ptr<QCheckBox>> checkBoxList;
-    list<unique_ptr<QPalette>> paletteList;
 	list<unique_ptr<QLabel>> paperIconLabelList;
     random_device rDevice;
     default_random_engine rEngine;
     uniform_int_distribution<int> uniformRange;
-    static vector<int> colorVector;
+    static vector<QString> colorVector;
 public:
     explicit KeywordListWidget(QWidget *parent = nullptr);
     void addNewProhibList();
