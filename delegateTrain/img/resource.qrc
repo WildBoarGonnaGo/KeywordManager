@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/delegateTrain">
+        <file>recycle_bin.png</file>
+        <file>plus_icon.png</file>
+        <file>papers_icon.png</file>
+        <file>up_document.png</file>
+    </qresource>
+</RCC>

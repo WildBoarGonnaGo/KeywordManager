@@ -23,6 +23,9 @@ set(PROJECT_SOURCES
 		lineeditdelegate.cpp
 		masktablemodel.h
 		masktablemodel.cpp
+        keyworddataset.cpp
+        keyworddataset.h
+        img/resource.qrc
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

@@ -19,8 +19,27 @@ QVariant MaskTableModel::data(const QModelIndex &index, int role) const {
 	}
 	return QVariant();
 }
+
 QVariant MaskTableModel::headerData(int section, Qt::Orientation orientation, int role) const {
 	if (role != Qt::DisplayRole) return QVariant();
 	else if (orientation == Qt::Horizontal)
 		return (!section) ? QString("Key") : QString("Value");
+    return QVariant();
+}
+
+Qt::ItemFlags MaskTableModel::flags(const QModelIndex &index) const {
+    if (!index.isValid()) return Qt::ItemIsEnabled;
+    if (index.row() < rowCount() && !index.column()) return QAbstractItemModel::flags(index) | Qt::ItemIsSelectable;
+    return QAbstractItemModel::flags(index) | Qt::ItemIsEditable;
+}
+
+bool MaskTableModel::setData(const QModelIndex &index, const QVariant& value, int role) {
+    if (index.isValid() && role == Qt::EditRole) {
+        QMap<QString, QVariant>::const_iterator it = map.begin();
+        int count = index.row();
+        while (count--) ++it;
+        map[it.key()] = value;
+        return true;
+    }
+    return false;
 }

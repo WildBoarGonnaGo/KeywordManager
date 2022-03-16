@@ -6,6 +6,7 @@ int main(int argc, char *argv[]) {
 	QMap<QString, QVariant> map;
 	map["First Name"] = "Misha";
 	map["Second Name"] = "Zavelskiy";
+    map["Age"] = 32;
 
 	MVCTestWidget w(map);
 
