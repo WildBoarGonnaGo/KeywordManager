@@ -1,7 +1,13 @@
 #include "masktablemodel.h"
 
-MaskTableModel::MaskTableModel(const QMap<QString, QVariant>& mapCp, QObject* parent)
-	: QAbstractTableModel(parent), map(mapCp), columns(2) { }
+MaskTableModel::MaskTableModel(const QMap<QString, QVariant>& mapCp,
+							   const QList<KeywordDataSet>& cpList, QObject* parent)
+	: QAbstractTableModel(parent), map(mapCp), columns(2),
+	  dataSetList(QList<KeywordDataSet>()) {  }
+
+MaskTableModel::MaskTableModel(const QMap<QString, QVariant>& mapCp,
+			   QList<KeywordDataSet>&& mvList, QObject* parent) :
+	QAbstractTableModel(parent), map(mapCp), dataSetList(std::move(mvList)), columns(dataSetList.size()) { }
 
 int MaskTableModel::rowCount(const QModelIndex& parent) const { return map.size(); }
 
@@ -16,6 +22,9 @@ QVariant MaskTableModel::data(const QModelIndex &index, int role) const {
 		while (count--) ++it;
 		if (!index.column()) return it.key();
 		return it.value();
+	}
+	else if (role == Qt::DecorationRole) {
+		if (index.row() == )
 	}
 	return QVariant();
 }
