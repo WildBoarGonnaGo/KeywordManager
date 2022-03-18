@@ -1,30 +1,44 @@
 #include "masktablemodel.h"
+#include <QPixmap>
+#include <QTextEdit>
 
 MaskTableModel::MaskTableModel(const QMap<QString, QVariant>& mapCp,
 							   const QList<KeywordDataSet>& cpList, QObject* parent)
-	: QAbstractTableModel(parent), map(mapCp), columns(2),
-	  dataSetList(QList<KeywordDataSet>()) {  }
+	: QAbstractTableModel(parent), map(mapCp), columns(4),
+	  dataSetList(QList<KeywordDataSet>()) {
+	QString addList("<a href=\"#\">Добавить список ключевых слов<\a>");
+	dataSetList.push_back(std::move(addList));
+}
 
 MaskTableModel::MaskTableModel(const QMap<QString, QVariant>& mapCp,
 			   QList<KeywordDataSet>&& mvList, QObject* parent) :
-	QAbstractTableModel(parent), map(mapCp), dataSetList(std::move(mvList)), columns(dataSetList.size()) { }
+	QAbstractTableModel(parent), map(mapCp), dataSetList(std::move(mvList)), columns(4) { }
 
-int MaskTableModel::rowCount(const QModelIndex& parent) const { return map.size(); }
+int MaskTableModel::rowCount(const QModelIndex& parent) const { return dataSetList.size(); }
 
 int MaskTableModel::columnCount(const QModelIndex &parent) const { return columns; }
 
 QVariant MaskTableModel::data(const QModelIndex &index, int role) const {
 	if (!index.isValid()) return QVariant();
-	if (index.row() >= map.size() && index.column() >= 2) return QVariant();
+	if (index.row() >= rowCount() && index.column() >= columns) return QVariant();
 	if (role == Qt::DisplayRole) {
-		QMap<QString, QVariant>::const_iterator it = map.begin();
+		if (index.row = rowCount() - 1) {
+			if (index.column() == 1) return dataSetList.back().getData();
+		}
+		/*QMap<QString, QVariant>::const_iterator it = map.begin();
 		int count = index.row();
 		while (count--) ++it;
 		if (!index.column()) return it.key();
-		return it.value();
+		return it.value();*/
 	}
 	else if (role == Qt::DecorationRole) {
-		if (index.row() == )
+		if (index.row() == rowCount() - 1 && index.column() == 0) {
+			return QPixmap::fromImage(dataSetList.back().getPlusPixmap())
+					.scaled(15 ,15, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+		}
+	}
+	else if (role == Qt::CheckStateRole) {
+		if (index.row() != rowCount() - 1) return dataSetList[index.row()].getCheck();
 	}
 	return QVariant();
 }
