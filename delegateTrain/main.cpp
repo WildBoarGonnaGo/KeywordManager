@@ -8,7 +8,9 @@ int main(int argc, char *argv[]) {
 	map["Second Name"] = "Zavelskiy";
     map["Age"] = 32;
 
-	MVCTestWidget w(map);
+    QList<KeywordDataSet> list;
+
+    MVCTestWidget w(map, std::move(list));
 
 	w.show();
 	return app.exec();

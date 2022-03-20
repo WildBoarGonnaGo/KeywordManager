@@ -25,6 +25,8 @@ set(PROJECT_SOURCES
 		masktablemodel.cpp
         keyworddataset.cpp
         keyworddataset.h
+        drawitemdelegate.h
+        drawitemdelegate.cpp
         img/resource.qrc
 )
 

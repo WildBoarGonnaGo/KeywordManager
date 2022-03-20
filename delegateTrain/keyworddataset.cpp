@@ -43,3 +43,9 @@ void KeywordDataSet::setData(const QString& data) { this->data = data; }
 void KeywordDataSet::setData(QString&& data) { this->data = std::move(data); }
 
 const QString& KeywordDataSet::getData() const { return data; }
+
+void KeywordDataSet::setCheckState(const int& checkState) { this->checkState = checkState; }
+
+void KeywordDataSet::setCheckState(int&& checkState) { this->checkState = std::move(checkState); }
+
+const int& KeywordDataSet::getCheckState() const { return checkState; }

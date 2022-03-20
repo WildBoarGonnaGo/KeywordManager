@@ -4,5 +4,7 @@
         <file>plus_icon.png</file>
         <file>papers_icon.png</file>
         <file>up_document.png</file>
+        <file>document_export.png</file>
+        <file>document_import.png</file>
     </qresource>
 </RCC>
