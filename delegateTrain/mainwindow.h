@@ -2,12 +2,13 @@
 #include "masktablemodel.h"
 #include <QTableView>
 #include "drawitemdelegate.h"
+#include "lineeditdelegate.h"
 
 class MVCTestWidget : public QWidget {
 	Q_OBJECT
 	QMap<QString, QVariant> _map;
     QList<KeywordDataSet> _list;
-	QAbstractItemModel* _model;
+	MaskTableModel* _model;
 	QTableView* _tableView;
     DrawItemDelegate* _drawDelegate;
 public:

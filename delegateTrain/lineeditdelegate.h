@@ -5,17 +5,23 @@
 #include <QWidget>
 #include <QPixmap>
 #include <QLabel>
+#include <QTableView>
 
 class LineEditDelegate : public QItemDelegate {
 	Q_OBJECT
     QPixmap papersPixmap;
     QLabel* label;
+	QTableView* tableView;
+	QString data;
 public:
 	LineEditDelegate(QObject *parent = nullptr);
     QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
     void setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const override;
     void updateEditorGeometry(QWidget* editor, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+	void setTableView(QTableView* tableView);
+	const QString& getData() const;
+	~LineEditDelegate();
 };
 
 #endif

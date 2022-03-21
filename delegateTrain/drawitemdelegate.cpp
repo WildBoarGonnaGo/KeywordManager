@@ -16,7 +16,7 @@ void DrawItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
     if (index.row() == model->rowCount() - 1 && index.column() == 1) {
         label->setTextFormat(Qt::RichText);
         label->setTextInteractionFlags(Qt::TextBrowserInteraction);
-        label->setOpenExternalLinks(true);
+		label->setOpenExternalLinks(false);
         label->setText(index.data().toString());
         view->setIndexWidget(index, label);
     } else QStyledItemDelegate::paint(painter, option, index);

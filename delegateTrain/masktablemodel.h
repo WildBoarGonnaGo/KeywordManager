@@ -1,3 +1,6 @@
+#ifndef MASKTABLEMODEL_H
+#define MASKTABLEMODEL_H
+
 #include <QAbstractTableModel>
 #include <QVariant>
 #include <QModelIndex>
@@ -7,13 +10,18 @@
 #include <QTableView>
 #include "keyworddataset.h"
 #include "drawitemdelegate.h"
+#include "lineeditdelegate.h"
 
 class MaskTableModel : public QAbstractTableModel {
+
+	Q_OBJECT
+
 	QMap<QString, QVariant> map;
 	QList<KeywordDataSet> dataSetList;
     QPixmap documentImportPixmap;
     QPixmap documentExportPixmap;
-    DrawItemDelegate* delegate;
+	DrawItemDelegate* delegate;
+	LineEditDelegate* lineEditDelegate;
     QTableView* view;
 	int columns;
 public:
@@ -29,9 +37,14 @@ public:
     Qt::ItemFlags flags(const QModelIndex &index) const override;
     bool setData(const QModelIndex &index, const QVariant& value, int role = Qt::EditRole) override;
     void setTableView(QTableView* view);
-    void setLastRowDelegate(DrawItemDelegate* delegate);
+	void setLastRowDelegate(DrawItemDelegate* delegate);
+	const QList<KeywordDataSet>& getDataSetList() const;
+	bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
+	//bool removeRows(int row, int count, const QModelIndex &parent) override;
 private:
     Qt::CheckState checkTotalState() const;
 public slots:
     void addNewList(const QString& dst);
 };
+
+#endif
