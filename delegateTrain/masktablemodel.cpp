@@ -87,9 +87,9 @@ bool MaskTableModel::setData(const QModelIndex &index, const QVariant& value, in
     KeywordDataSet someSet;
     dataSetList.push_back(std::move(value.toString()));
     if (!index.isValid()) return false;
-	/*if (index.isValid() && role == Qt::EditRole) {
+    if (index.isValid() && role == Qt::EditRole) {
 
-	}*/
+    }
     return true;
 }
 
@@ -121,28 +121,19 @@ void MaskTableModel::addNewList(const QString& dst) {
 	qDebug() << "Entered!";
 	assert(this->view != nullptr);
 	assert(this->lineEditDelegate != nullptr);
-	//dataSetList.push_front(KeywordDataSet(lineEditDelegate->getData()));
 
 	int bound = dataSetList.size() - 1;
 
 	insertRows(bound, 1);
-	bound = dataSetList.size() - 1;
-	/*for (int i = 0; i < bound; ++i) {
-		setData(this->index(i, 0), dataSetList[i].getCheckState(), Qt::CheckStateRole);
-		setData(this->index(i, 1), dataSetList[i].getData(), Qt::EditRole);
-		setData(this->index(i, 2), dataSetList[i].getRecycleBinImage()
-				.scaled(15, 15, Qt::KeepAspectRatio, Qt::SmoothTransformation), Qt::DecorationRole);
-		setData(this->index(i, 3), dataSetList[i].getUpImage()
-				.scaled(15, 15, Qt::KeepAspectRatio, Qt::SmoothTransformation), Qt::DecorationRole);
-		this->view->setItemDelegateForRow(i, lineEditDelegate);
-	}
-
-	setData(this->index(bound, 0), dataSetList.back().getPlusImage(), Qt::DecorationRole);
-	setData(this->index(bound, 1), dataSetList.back().getData(), Qt::DisplayRole);*/
-	for (int i = 0; i < rowCount() - 1; ++i) this->view->setItemDelegateForRow(i, lineEditDelegate);
+    dataSetList[bound].getLineEditDelegate()->setTableView(this->view);
+    for (int i = 0; i < rowCount() - 1; ++i) {
+        this->view->setItemDelegateForRow(i, dataSetList[i].getLineEditDelegate());
+        this->view->setIndexWidget(this->index(i, 1), dataSetList[i].getLineEditDelegate()->getLabel());
+    }
 	this->view->setItemDelegateForRow(rowCount() - 1, delegate);
 
 	emit dataChanged(index(0, 0), index(rowCount() - 1, 3));
+    connect(this, &MaskTableModel::dataChanged, )
 }
 
 const QList<KeywordDataSet>& MaskTableModel::getDataSetList() const { return this->dataSetList; }

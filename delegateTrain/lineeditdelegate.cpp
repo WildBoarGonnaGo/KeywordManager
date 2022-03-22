@@ -16,7 +16,8 @@ void LineEditDelegate::setModelData(QWidget* editor, QAbstractItemModel* model, 
 	QLineEdit* lineEdit = static_cast<QLineEdit*>(editor);
 
 	if (index.row() < model->rowCount() - 1 && index.column() == 1) {
-		//this->data = lineEdit->text();
+        QString targetText = lineEdit->text();
+        model->setData(index, targetText);
 	}
 
 }
@@ -32,12 +33,24 @@ void LineEditDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
 
 		label->setPixmap(papersPixmap.scaled(15, 15, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 		label->setText(index.data().toString());
-		tableView->setIndexWidget(index, label);
-    }
+        //tableView->setIndexWidget(index, label);
+    } else QItemDelegate::paint(painter, option, index);
 }
 
 void LineEditDelegate::setTableView(QTableView* tableView) { this->tableView = tableView; }
 
 const QString& LineEditDelegate::getData() const { return this->data; }
+
+QLabel* LineEditDelegate::getLabel() { return this->label; }
+
+void LineEditDelegate::setEditorData(QWidget* editor, const QModelIndex& index) const {
+    if (!index.isValid()) return ;
+    if (index.row() < index.model()->rowCount() - 1 && index.column() == 1) {
+        QString value = index.model()->data(index, Qt::EditRole).toString();
+
+        QLineEdit* lineEditor = static_cast<QLineEdit*>(editor);
+        lineEditor->setText(value);
+    }
+}
 
 LineEditDelegate::~LineEditDelegate() { if (label) delete label; }

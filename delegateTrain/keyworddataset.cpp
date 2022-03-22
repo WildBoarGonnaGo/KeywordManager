@@ -5,7 +5,9 @@ KeywordDataSet::KeywordDataSet() :
     documentImage(":/delegateTrain/papers_icon.png"),
     recycleBinImage(":/delegateTrain/recycle_bin.png"),
     upImage(":/delegateTrain/up_document.png"),
-    data(QString())
+    data(QString()),
+    lineEditDelegate(new LineEditDelegate()),
+    checkState(0)
 {
 
 }
@@ -15,7 +17,9 @@ KeywordDataSet::KeywordDataSet(const QString& cpData) :
     documentImage(":/delegateTrain/papers_icon.png"),
     recycleBinImage(":/delegateTrain/recycle_bin.png"),
     upImage(":/delegateTrain/up_document.png"),
-    data(cpData)
+    data(cpData),
+    lineEditDelegate(new LineEditDelegate()),
+    checkState(0)
 {
 
 }
@@ -25,7 +29,9 @@ KeywordDataSet::KeywordDataSet(const QString&& mvData) :
     documentImage(":/delegateTrain/papers_icon.png"),
     recycleBinImage(":/delegateTrain/recycle_bin.png"),
     upImage(":/delegateTrain/up_document.png"),
-    data(std::move(mvData))
+    data(std::move(mvData)),
+    lineEditDelegate(new LineEditDelegate()),
+    checkState(0)
 {
 
 }
@@ -49,3 +55,5 @@ void KeywordDataSet::setCheckState(const int& checkState) { this->checkState = c
 void KeywordDataSet::setCheckState(int&& checkState) { this->checkState = std::move(checkState); }
 
 const int& KeywordDataSet::getCheckState() const { return checkState; }
+
+LineEditDelegate* KeywordDataSet::getLineEditDelegate() { return lineEditDelegate; }

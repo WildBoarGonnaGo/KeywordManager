@@ -3,6 +3,7 @@
 
 #include <QImage>
 #include <memory>
+#include "lineeditdelegate.h"
 
 class KeywordDataSet
 {
@@ -11,6 +12,7 @@ class KeywordDataSet
     QImage recycleBinImage;
     QImage upImage;
     QString data;
+    LineEditDelegate* lineEditDelegate;
     int checkState;
 public:
     KeywordDataSet();
@@ -26,6 +28,7 @@ public:
     void setCheckState(const int& checkState);
     void setCheckState(int&& checkState);
     const int& getCheckState() const;
+    LineEditDelegate* getLineEditDelegate();
 };
 
 #endif // KEYWORDDATASET_H

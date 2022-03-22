@@ -45,6 +45,7 @@ private:
     Qt::CheckState checkTotalState() const;
 public slots:
     void addNewList(const QString& dst);
+    void openEditor();
 };
 
 #endif
