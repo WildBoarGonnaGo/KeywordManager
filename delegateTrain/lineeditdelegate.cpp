@@ -3,21 +3,27 @@
 #include <QLineEdit>
 #include <QString>
 #include <QClipboard>
+#include <QPainter>
+#include <QDebug>
+#include <QPointF>
 
 LineEditDelegate::LineEditDelegate(QObject *parent) : QItemDelegate(parent), papersPixmap(":/delegateTrain/papers_icon.png"),
-	label(new QLabel()), tableView(nullptr), data(QString()) {  }
+	label(new QLabel()), tableView(nullptr), data(QString()) { }
 
 QWidget *LineEditDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const {
+	qDebug() << "createEditor enter";
 	QLineEdit* editor = new QLineEdit(parent);
 	return editor;
 }
 
 void LineEditDelegate::setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const {
 	QLineEdit* lineEdit = static_cast<QLineEdit*>(editor);
+	qDebug() << "setModelData enter";
+	qDebug() << "setModelData::index.row() = " << index.row();
 
 	if (index.row() < model->rowCount() - 1 && index.column() == 1) {
-        QString targetText = lineEdit->text();
-        model->setData(index, targetText);
+		QString targetText = lineEdit->text();
+		model->setData(index, targetText, Qt::EditRole);
 	}
 
 }
@@ -29,11 +35,11 @@ void LineEditDelegate::updateEditorGeometry(QWidget* editor, const QStyleOptionV
 void LineEditDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {
     if (!index.isValid()) return ;
     if (index.row() < index.model()->rowCount() - 1 && index.column() == 1) {
-		assert(label != nullptr && tableView != nullptr);
+		QPointF iconPoint(option.rect.left(), option.rect.top() + 8);
+		QPointF textPoint(option.rect.left() + 20, option.rect.bottom() - 8);
 
-		label->setPixmap(papersPixmap.scaled(15, 15, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-		label->setText(index.data().toString());
-        //tableView->setIndexWidget(index, label);
+		painter->drawPixmap(iconPoint, papersPixmap.scaled(15, 15, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+		painter->drawText(textPoint, index.model()->data(index, Qt::EditRole).toString());
     } else QItemDelegate::paint(painter, option, index);
 }
 
@@ -45,6 +51,7 @@ QLabel* LineEditDelegate::getLabel() { return this->label; }
 
 void LineEditDelegate::setEditorData(QWidget* editor, const QModelIndex& index) const {
     if (!index.isValid()) return ;
+	qDebug() << "setEditorData enter";
     if (index.row() < index.model()->rowCount() - 1 && index.column() == 1) {
         QString value = index.model()->data(index, Qt::EditRole).toString();
 

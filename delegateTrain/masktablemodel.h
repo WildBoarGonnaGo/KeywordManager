@@ -40,12 +40,11 @@ public:
 	void setLastRowDelegate(DrawItemDelegate* delegate);
 	const QList<KeywordDataSet>& getDataSetList() const;
 	bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
-	//bool removeRows(int row, int count, const QModelIndex &parent) override;
 private:
     Qt::CheckState checkTotalState() const;
 public slots:
     void addNewList(const QString& dst);
-    void openEditor();
+	//void openEditor();
 };
 
 #endif

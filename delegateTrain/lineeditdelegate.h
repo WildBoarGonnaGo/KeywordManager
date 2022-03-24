@@ -10,7 +10,8 @@
 class LineEditDelegate : public QItemDelegate {
 	Q_OBJECT
     QPixmap papersPixmap;
-    QLabel* label;
+	QLabel* label;
+	//QLineEdit* delegateLineEdit;
 	QTableView* tableView;
 	QString data;
 public:
@@ -19,7 +20,7 @@ public:
     void setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const override;
     void updateEditorGeometry(QWidget* editor, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
     void setEditorData(QWidget* editor, const QModelIndex& index = QModelIndex()) const override;
-    void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+	void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 	void setTableView(QTableView* tableView);
 	const QString& getData() const;
     QLabel* getLabel();

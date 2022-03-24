@@ -80,16 +80,19 @@ Qt::ItemFlags MaskTableModel::flags(const QModelIndex &index) const {
     if (!index.isValid()) return Qt::ItemIsEnabled;
     if (index.row() == rowCount() - 1) return QAbstractItemModel::flags(index) | Qt::ItemIsSelectable;
     if (index.row() < rowCount() - 1 && index.column() != 1) return QAbstractItemModel::flags(index) | Qt::ItemIsSelectable;
-    return QAbstractItemModel::flags(index) | Qt::ItemIsEditable;
+	//if (index.row() < rowCount() - 1 && index.column() == 1) return QAbstractItemModel::flags(index) | Qt::ItemIsEditable | Qt::ItemIsEnabled;
+	return QAbstractItemModel::flags(index) | Qt::ItemIsEditable;
 }
 
 bool MaskTableModel::setData(const QModelIndex &index, const QVariant& value, int role) {
     KeywordDataSet someSet;
-    dataSetList.push_back(std::move(value.toString()));
+	//dataSetList.push_back(std::move(value.toString()));
     if (!index.isValid()) return false;
-    if (index.isValid() && role == Qt::EditRole) {
-
-    }
+	if (index.isValid() && role == Qt::EditRole) {
+		dataSetList[index.row()].setData(value.toString());
+		emit dataChanged(index, index, {role});
+		return true;
+	}
     return true;
 }
 
@@ -126,14 +129,11 @@ void MaskTableModel::addNewList(const QString& dst) {
 
 	insertRows(bound, 1);
     dataSetList[bound].getLineEditDelegate()->setTableView(this->view);
-    for (int i = 0; i < rowCount() - 1; ++i) {
+	for (int i = 0; i < rowCount() - 1; ++i)
         this->view->setItemDelegateForRow(i, dataSetList[i].getLineEditDelegate());
-        this->view->setIndexWidget(this->index(i, 1), dataSetList[i].getLineEditDelegate()->getLabel());
-    }
 	this->view->setItemDelegateForRow(rowCount() - 1, delegate);
 
 	emit dataChanged(index(0, 0), index(rowCount() - 1, 3));
-    connect(this, &MaskTableModel::dataChanged, )
 }
 
 const QList<KeywordDataSet>& MaskTableModel::getDataSetList() const { return this->dataSetList; }
