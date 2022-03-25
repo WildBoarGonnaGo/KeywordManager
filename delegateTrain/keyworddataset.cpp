@@ -7,7 +7,8 @@ KeywordDataSet::KeywordDataSet() :
     upImage(":/delegateTrain/up_document.png"),
     data(QString()),
     lineEditDelegate(new LineEditDelegate()),
-    checkState(0)
+	checkState(0),
+	color(Qt::black)
 {
 
 }
@@ -19,7 +20,8 @@ KeywordDataSet::KeywordDataSet(const QString& cpData) :
     upImage(":/delegateTrain/up_document.png"),
     data(cpData),
     lineEditDelegate(new LineEditDelegate()),
-    checkState(0)
+	checkState(0),
+	color(Qt::black)
 {
 
 }
@@ -31,7 +33,8 @@ KeywordDataSet::KeywordDataSet(const QString&& mvData) :
     upImage(":/delegateTrain/up_document.png"),
     data(std::move(mvData)),
     lineEditDelegate(new LineEditDelegate()),
-    checkState(0)
+	checkState(0),
+	color(Qt::black)
 {
 
 }
@@ -47,6 +50,12 @@ const QImage& KeywordDataSet::getUpImage() const { return upImage; }
 void KeywordDataSet::setData(const QString& data) { this->data = data; }
 
 void KeywordDataSet::setData(QString&& data) { this->data = std::move(data); }
+
+void KeywordDataSet::setColor(int&& color) { this->color = std::move(color); }
+
+void KeywordDataSet::setColor(int& color) { this->color = color; }
+
+const int& KeywordDataSet::getColor() const { return color; }
 
 const QString& KeywordDataSet::getData() const { return data; }
 

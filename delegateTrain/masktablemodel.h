@@ -4,13 +4,13 @@
 #include <QAbstractTableModel>
 #include <QVariant>
 #include <QModelIndex>
-#include <QMap>
 #include <memory>
 #include <QPixmap>
 #include <QTableView>
 #include "keyworddataset.h"
 #include "drawitemdelegate.h"
 #include "lineeditdelegate.h"
+#include <QVector>
 
 class MaskTableModel : public QAbstractTableModel {
 
@@ -24,6 +24,8 @@ class MaskTableModel : public QAbstractTableModel {
 	LineEditDelegate* lineEditDelegate;
     QTableView* view;
 	int columns;
+	int boundSave;
+	static const QVector<Qt::GlobalColor> colorVector;
 public:
 	MaskTableModel(const QMap<QString, QVariant>& mapCp = QMap<QString, QVariant>(),
 				   const QList<KeywordDataSet>& cpList = QList<KeywordDataSet>(),
@@ -44,7 +46,7 @@ private:
     Qt::CheckState checkTotalState() const;
 public slots:
     void addNewList(const QString& dst);
-	//void openEditor();
+	void openEditor();
 };
 
 #endif

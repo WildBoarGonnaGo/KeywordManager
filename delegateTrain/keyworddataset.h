@@ -14,6 +14,7 @@ class KeywordDataSet
     QString data;
     LineEditDelegate* lineEditDelegate;
     int checkState;
+	int color;
 public:
     KeywordDataSet();
     KeywordDataSet(const QString& cpData);
@@ -24,6 +25,9 @@ public:
     const QImage& getUpImage() const;
     void setData(const QString& data);
     void setData(QString&& data);
+	void setColor(int&& color);
+	void setColor(int& color);
+	const int& getColor() const;
     const QString& getData() const;
     void setCheckState(const int& checkState);
     void setCheckState(int&& checkState);

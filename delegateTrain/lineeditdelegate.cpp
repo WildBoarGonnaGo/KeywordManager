@@ -6,6 +6,7 @@
 #include <QPainter>
 #include <QDebug>
 #include <QPointF>
+#include <QRect>
 
 LineEditDelegate::LineEditDelegate(QObject *parent) : QItemDelegate(parent), papersPixmap(":/delegateTrain/papers_icon.png"),
 	label(new QLabel()), tableView(nullptr), data(QString()) { }
@@ -18,18 +19,18 @@ QWidget *LineEditDelegate::createEditor(QWidget *parent, const QStyleOptionViewI
 
 void LineEditDelegate::setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const {
 	QLineEdit* lineEdit = static_cast<QLineEdit*>(editor);
-	qDebug() << "setModelData enter";
-	qDebug() << "setModelData::index.row() = " << index.row();
 
 	if (index.row() < model->rowCount() - 1 && index.column() == 1) {
 		QString targetText = lineEdit->text();
 		model->setData(index, targetText, Qt::EditRole);
 	}
-
 }
 
 void LineEditDelegate::updateEditorGeometry(QWidget* editor, const QStyleOptionViewItem& option, const QModelIndex& index) const {
-	editor->setGeometry(option.rect);
+	QPoint topLeft(option.rect.left() + 20, option.rect.top());
+	QRect  editorRect(topLeft, option.rect.bottomRight());
+
+	editor->setGeometry(editorRect);
 }
 
 void LineEditDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {

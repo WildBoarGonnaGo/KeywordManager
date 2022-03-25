@@ -5,6 +5,12 @@
 #include <QDebug>
 #include <iostream>
 
+const QVector<Qt::GlobalColor> MaskTableModel::colorVector =
+	{Qt::white, Qt::black, Qt::red, Qt::darkRed, Qt::green,
+	Qt::darkGreen, Qt::blue, Qt::darkBlue, Qt::cyan, Qt::darkCyan,
+	Qt::magenta, Qt::darkMagenta, Qt::yellow, Qt::darkYellow, Qt::gray,
+	Qt::lightGray, Qt::darkGray};
+
 MaskTableModel::MaskTableModel(const QMap<QString, QVariant>& mapCp,
 							   const QList<KeywordDataSet>& cpList, QObject* parent)
 	: QAbstractTableModel(parent), map(mapCp), columns(4),
@@ -80,13 +86,11 @@ Qt::ItemFlags MaskTableModel::flags(const QModelIndex &index) const {
     if (!index.isValid()) return Qt::ItemIsEnabled;
     if (index.row() == rowCount() - 1) return QAbstractItemModel::flags(index) | Qt::ItemIsSelectable;
     if (index.row() < rowCount() - 1 && index.column() != 1) return QAbstractItemModel::flags(index) | Qt::ItemIsSelectable;
-	//if (index.row() < rowCount() - 1 && index.column() == 1) return QAbstractItemModel::flags(index) | Qt::ItemIsEditable | Qt::ItemIsEnabled;
 	return QAbstractItemModel::flags(index) | Qt::ItemIsEditable;
 }
 
 bool MaskTableModel::setData(const QModelIndex &index, const QVariant& value, int role) {
     KeywordDataSet someSet;
-	//dataSetList.push_back(std::move(value.toString()));
     if (!index.isValid()) return false;
 	if (index.isValid() && role == Qt::EditRole) {
 		dataSetList[index.row()].setData(value.toString());
@@ -126,14 +130,10 @@ void MaskTableModel::addNewList(const QString& dst) {
 	assert(this->lineEditDelegate != nullptr);
 
 	int bound = dataSetList.size() - 1;
+	boundSave = bound;
 
+	connect(this, SIGNAL(rowsInserted(QModelIndex,int,int)), this, SLOT(openEditor()));
 	insertRows(bound, 1);
-    dataSetList[bound].getLineEditDelegate()->setTableView(this->view);
-	for (int i = 0; i < rowCount() - 1; ++i)
-        this->view->setItemDelegateForRow(i, dataSetList[i].getLineEditDelegate());
-	this->view->setItemDelegateForRow(rowCount() - 1, delegate);
-
-	emit dataChanged(index(0, 0), index(rowCount() - 1, 3));
 }
 
 const QList<KeywordDataSet>& MaskTableModel::getDataSetList() const { return this->dataSetList; }
@@ -145,10 +145,16 @@ bool MaskTableModel::insertRows(int row, int count, const QModelIndex &parent) {
 	int bound = row + count;
 	for (int i = row; i < bound; ++i)
 		dataSetList.insert(i, KeywordDataSet(lineEditDelegate->getData()));
+	dataSetList[bound].getLineEditDelegate()->setTableView(this->view);
+	for (int i = 0; i < rowCount() - 1; ++i)
+		this->view->setItemDelegateForRow(i, dataSetList[i].getLineEditDelegate());
+	this->view->setItemDelegateForRow(rowCount() - 1, delegate);
 	endInsertRows();
 	return true;
 }
 
-/*bool MaskTableModel::removeRows(int row, int count, const QModelIndex &parent) override {
-
-}*/
+void MaskTableModel::openEditor() {
+	qDebug() << "Open editor called";
+	QModelIndex editorIndex = this->index(boundSave, 1);
+	emit this->view->edit(editorIndex);
+}
