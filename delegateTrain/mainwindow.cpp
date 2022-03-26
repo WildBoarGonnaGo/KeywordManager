@@ -22,6 +22,7 @@ MVCTestWidget::MVCTestWidget(const QMap<QString, QVariant>& map, const QList<Key
     _tableView->setColumnWidth(1, 400);
     _tableView->setColumnWidth(2, 25);
     _tableView->setColumnWidth(3, 25);
+    _tableView->setMouseTracking(true);
     _drawDelegate->setTableView(_tableView);
 	_model->setLastRowDelegate(_drawDelegate);
 	std::cout << "_drawDelegate = " << std::hex << _drawDelegate << std::endl;
@@ -49,6 +50,7 @@ MVCTestWidget::MVCTestWidget(const QMap<QString, QVariant>& map, QList<KeywordDa
     _tableView->setColumnWidth(1, 400);
     _tableView->setColumnWidth(2, 25);
     _tableView->setColumnWidth(3, 25);
+    _tableView->setMouseTracking(true);
     _drawDelegate->setTableView(_tableView);
 	_model->setLastRowDelegate(_drawDelegate);
 	std::cout << "_drawDelegate->getLabel() = " << std::hex << _drawDelegate->getLabel() << std::endl;

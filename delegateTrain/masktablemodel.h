@@ -47,6 +47,8 @@ private:
 public slots:
     void addNewList(const QString& dst);
 	void openEditor();
+    void showRecycle(const QModelIndex& parent);
+    void hideRecycle(const QModelIndex& parent);
 };
 
 #endif

@@ -7,13 +7,17 @@
 #include <QLabel>
 #include <QTableView>
 
+class KeywordDataSet;
+
 class LineEditDelegate : public QItemDelegate {
 	Q_OBJECT
     QPixmap papersPixmap;
+    QPixmap recyleBinPixmap;
 	QLabel* label;
-	//QLineEdit* delegateLineEdit;
 	QTableView* tableView;
+    KeywordDataSet* dataSet;
 	QString data;
+    bool activeRecycle;
 public:
 	LineEditDelegate(QObject *parent = nullptr);
     QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
@@ -22,6 +26,10 @@ public:
     void setEditorData(QWidget* editor, const QModelIndex& index = QModelIndex()) const override;
 	void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 	void setTableView(QTableView* tableView);
+    void setActiveRecycle(const bool& activeRecycle);
+    void setDataSet(KeywordDataSet* dataSet);
+    const KeywordDataSet* getDataSet() const;
+    const bool& getActiveRecycle() const;
 	const QString& getData() const;
     QLabel* getLabel();
 	~LineEditDelegate();

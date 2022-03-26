@@ -6,7 +6,7 @@
 #include <iostream>
 
 const QVector<Qt::GlobalColor> MaskTableModel::colorVector =
-	{Qt::white, Qt::black, Qt::red, Qt::darkRed, Qt::green,
+    { Qt::white, Qt::black, Qt::red, Qt::darkRed, Qt::green,
 	Qt::darkGreen, Qt::blue, Qt::darkBlue, Qt::cyan, Qt::darkCyan,
 	Qt::magenta, Qt::darkMagenta, Qt::yellow, Qt::darkYellow, Qt::gray,
 	Qt::lightGray, Qt::darkGray};
@@ -117,23 +117,20 @@ void MaskTableModel::setLastRowDelegate(DrawItemDelegate* delegate) {
 	if (this->delegate) {
 		connect(this->delegate->getLabel(), &QLabel::linkActivated,
 					this, &MaskTableModel::addNewList);
-		std::cout << "this->delegate->getLabel() = "
-				  << std::hex << this->delegate->getLabel() << std::endl;
-		std::cout << "this = "
-				  << std::hex << this << std::endl;
 	}
 }
 
 void MaskTableModel::addNewList(const QString& dst) {
-	qDebug() << "Entered!";
 	assert(this->view != nullptr);
 	assert(this->lineEditDelegate != nullptr);
 
 	int bound = dataSetList.size() - 1;
 	boundSave = bound;
 
-	connect(this, SIGNAL(rowsInserted(QModelIndex,int,int)), this, SLOT(openEditor()));
+    connect(this, SIGNAL(rowsInserted(QModelIndex,int,int)), this, SLOT(openEditor()));
 	insertRows(bound, 1);
+    connect(this->view, SIGNAL(entered(QModelIndex)), this, SLOT(showRecycle(QModelIndex)));
+    connect(this->view, SIGNAL(viewportEntered()), this, SLOT(hideRecycle(QModelIndex)));
 }
 
 const QList<KeywordDataSet>& MaskTableModel::getDataSetList() const { return this->dataSetList; }
@@ -151,6 +148,20 @@ bool MaskTableModel::insertRows(int row, int count, const QModelIndex &parent) {
 	this->view->setItemDelegateForRow(rowCount() - 1, delegate);
 	endInsertRows();
 	return true;
+}
+
+void MaskTableModel::showRecycle(const QModelIndex& parent) {
+    if (!parent.isValid()) return;
+    if (parent.row() < rowCount() - 1 && parent.column() == 2)
+        dataSetList[boundSave].getLineEditDelegate()->setActiveRecycle(true);
+    qDebug() << "showRecycle called";
+}
+
+void MaskTableModel::hideRecycle(const QModelIndex& parent) {
+    if (!parent.isValid()) return;
+    if (parent.row() < rowCount() - 1 && parent.column() == 2)
+        dataSetList[boundSave].getLineEditDelegate()->setActiveRecycle(false);
+    qDebug() << "hideRecycle called";
 }
 
 void MaskTableModel::openEditor() {
