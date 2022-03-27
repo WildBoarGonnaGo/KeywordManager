@@ -11,6 +11,7 @@
 #include "drawitemdelegate.h"
 #include "lineeditdelegate.h"
 #include <QVector>
+#include <QEvent>
 
 class MaskTableModel : public QAbstractTableModel {
 
@@ -42,13 +43,17 @@ public:
 	void setLastRowDelegate(DrawItemDelegate* delegate);
 	const QList<KeywordDataSet>& getDataSetList() const;
 	bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
+    bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
+    bool eventFilter(QObject* watched, QEvent* event) override;
 private:
     Qt::CheckState checkTotalState() const;
+    void setButtonActive(QPushButton* button, const bool& activeState);
 public slots:
     void addNewList(const QString& dst);
+    void removeList(const QModelIndex& parent);
 	void openEditor();
     void showRecycle(const QModelIndex& parent);
-    void hideRecycle(const QModelIndex& parent);
+    void hideRecycle();
 };
 
 #endif

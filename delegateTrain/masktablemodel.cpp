@@ -4,6 +4,7 @@
 #include <cassert>
 #include <QDebug>
 #include <iostream>
+#include <QMouseEvent>
 
 const QVector<Qt::GlobalColor> MaskTableModel::colorVector =
     { Qt::white, Qt::black, Qt::red, Qt::darkRed, Qt::green,
@@ -22,6 +23,7 @@ MaskTableModel::MaskTableModel(const QMap<QString, QVariant>& mapCp,
 	  view(nullptr) {
     QString addList("<a href=\"#\">Добавить список ключевых слов<\\a>");
 	dataSetList.push_back(std::move(addList));
+
 }
 
 MaskTableModel::MaskTableModel(const QMap<QString, QVariant>& mapCp,
@@ -83,9 +85,14 @@ QVariant MaskTableModel::headerData(int section, Qt::Orientation orientation, in
 }
 
 Qt::ItemFlags MaskTableModel::flags(const QModelIndex &index) const {
+
+    //const KeywordDataSet tmpSet = dataSetList[index.row()].get
+
     if (!index.isValid()) return Qt::ItemIsEnabled;
     if (index.row() == rowCount() - 1) return QAbstractItemModel::flags(index) | Qt::ItemIsSelectable;
     if (index.row() < rowCount() - 1 && index.column() != 1) return QAbstractItemModel::flags(index) | Qt::ItemIsSelectable;
+    if (index.row() < rowCount() - 1 && !index.column()) return QAbstractItemModel::flags(index) | Qt::ItemIsUserCheckable;
+    //if (index.row() < rowCount() - 1 && dataSetList[index.row()].getLineEditDelegate()->getActiveRecycle())
 	return QAbstractItemModel::flags(index) | Qt::ItemIsEditable;
 }
 
@@ -110,6 +117,7 @@ Qt::CheckState MaskTableModel::checkTotalState() const {
 void MaskTableModel::setTableView(QTableView* view) {
 	this->view = view;
 	lineEditDelegate->setTableView(this->view);
+    this->view->viewport()->installEventFilter(this);
 }
 
 void MaskTableModel::setLastRowDelegate(DrawItemDelegate* delegate) {
@@ -130,7 +138,8 @@ void MaskTableModel::addNewList(const QString& dst) {
     connect(this, SIGNAL(rowsInserted(QModelIndex,int,int)), this, SLOT(openEditor()));
 	insertRows(bound, 1);
     connect(this->view, SIGNAL(entered(QModelIndex)), this, SLOT(showRecycle(QModelIndex)));
-    connect(this->view, SIGNAL(viewportEntered()), this, SLOT(hideRecycle(QModelIndex)));
+    connect(this->view, SIGNAL(viewportEntered()), this, SLOT(hideRecycle()));
+    connect(dataSetList[bound].getLineEditDelegate()->getRecycleBinButton(), SIGNAL(clicked(bool)), this, SLOT(removeList()));
 }
 
 const QList<KeywordDataSet>& MaskTableModel::getDataSetList() const { return this->dataSetList; }
@@ -143,29 +152,73 @@ bool MaskTableModel::insertRows(int row, int count, const QModelIndex &parent) {
 	for (int i = row; i < bound; ++i)
 		dataSetList.insert(i, KeywordDataSet(lineEditDelegate->getData()));
 	dataSetList[bound].getLineEditDelegate()->setTableView(this->view);
-	for (int i = 0; i < rowCount() - 1; ++i)
+    for (int i = 0; i < rowCount() - 1; ++i) {
 		this->view->setItemDelegateForRow(i, dataSetList[i].getLineEditDelegate());
+        dataSetList[i].getLineEditDelegate()->setTableView(this->view);
+    }
 	this->view->setItemDelegateForRow(rowCount() - 1, delegate);
 	endInsertRows();
 	return true;
 }
 
-void MaskTableModel::showRecycle(const QModelIndex& parent) {
-    if (!parent.isValid()) return;
-    if (parent.row() < rowCount() - 1 && parent.column() == 2)
-        dataSetList[boundSave].getLineEditDelegate()->setActiveRecycle(true);
-    qDebug() << "showRecycle called";
+bool MaskTableModel::removeRows(int row, int count, const QModelIndex &parent) {
+    if (!parent.isValid()) return false;
+    beginRemoveRows(QModelIndex(), row, row + count - 1);
+    QList<KeywordDataSet>::const_iterator it = dataSetList.begin();
+    for (int i = 0; i < row + count - 1; ++i) ++it;
+    dataSetList.erase(it);
+    endRemoveRows();
 }
 
-void MaskTableModel::hideRecycle(const QModelIndex& parent) {
+void MaskTableModel::showRecycle(const QModelIndex& parent) {
     if (!parent.isValid()) return;
-    if (parent.row() < rowCount() - 1 && parent.column() == 2)
-        dataSetList[boundSave].getLineEditDelegate()->setActiveRecycle(false);
-    qDebug() << "hideRecycle called";
+    if (parent.row() < rowCount() - 1) {
+        dataSetList[parent.row()].getLineEditDelegate()->setActiveRecycle(true);
+    }
+}
+
+void MaskTableModel::hideRecycle() {
+    for (int i = 0; i < rowCount() - 1; ++i)
+        dataSetList[i].getLineEditDelegate()->setActiveRecycle(false);
 }
 
 void MaskTableModel::openEditor() {
-	qDebug() << "Open editor called";
 	QModelIndex editorIndex = this->index(boundSave, 1);
 	emit this->view->edit(editorIndex);
+}
+
+bool MaskTableModel::eventFilter(QObject* watched, QEvent* event) {
+    if (watched == this->view->viewport()) {
+        if (event->type() == QEvent::MouseMove) {
+            QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
+            QModelIndex mouseIndex = this->view->indexAt(mouseEvent->pos());
+            qDebug() << "mouseIndex.row() = " << mouseIndex.row();
+            qDebug() << "mouseIndex.column() = " << mouseIndex.column();
+            if (mouseIndex.isValid()) {
+                for (int i = 0; i < rowCount(); ++i) {
+                    if (i == rowCount() - 1) break;
+                    QPushButton* tmpButton = dataSetList[i].getLineEditDelegate()->getRecycleBinButton();
+                    setButtonActive(tmpButton, (i == mouseIndex.row()) ? true : false);
+                }
+            } else {
+                for (int i = 0; i < rowCount(); ++i) {
+                    QPushButton* tmpButton = dataSetList[i].getLineEditDelegate()->getRecycleBinButton();
+                    setButtonActive(tmpButton, false);
+                }
+            }
+        }
+    }
+    return QAbstractTableModel::eventFilter(watched, event);
+}
+
+void MaskTableModel::setButtonActive(QPushButton* button, const bool& activeState) {
+    qDebug() << "setButtonAcrive::activeState" << activeState;
+    button->setEnabled(activeState);
+    button->setVisible(activeState);
+    if (activeState) button->show();
+    else button->hide();
+}
+
+void MaskTableModel::removeList(const QModelIndex& parent) {
+
 }

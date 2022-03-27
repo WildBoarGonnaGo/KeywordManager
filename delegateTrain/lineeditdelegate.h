@@ -6,16 +6,18 @@
 #include <QPixmap>
 #include <QLabel>
 #include <QTableView>
+#include <QPushButton>
 
 class KeywordDataSet;
 
 class LineEditDelegate : public QItemDelegate {
 	Q_OBJECT
     QPixmap papersPixmap;
-    QPixmap recyleBinPixmap;
+    QPixmap recycleBinPixmap;
 	QLabel* label;
 	QTableView* tableView;
     KeywordDataSet* dataSet;
+    QPushButton* recycleBinButton;
 	QString data;
     bool activeRecycle;
 public:
@@ -32,6 +34,7 @@ public:
     const bool& getActiveRecycle() const;
 	const QString& getData() const;
     QLabel* getLabel();
+    QPushButton* getRecycleBinButton();
 	~LineEditDelegate();
 };
 

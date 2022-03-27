@@ -6,11 +6,19 @@
 #include <QDebug>
 #include <QPointF>
 #include <QRect>
+#include <QIcon>
 
 LineEditDelegate::LineEditDelegate(QObject *parent) : QItemDelegate(parent),
     papersPixmap(":/delegateTrain/papers_icon.png"),
-    recyleBinPixmap(":/delegateTrain/recycle_bin.png"),
-    label(new QLabel()), tableView(nullptr), data(QString()), activeRecycle(false) { }
+    recycleBinPixmap(":/delegateTrain/recycle_bin.png"),
+    label(new QLabel()), tableView(nullptr),
+    recycleBinButton(new QPushButton()),
+    data(QString()), activeRecycle(false) {
+    QIcon recycleBinIcon(recycleBinPixmap.scaled(15, 15, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+
+    recycleBinButton->setIcon(recycleBinIcon);
+    recycleBinButton->setFlat(true);
+}
 
 QWidget *LineEditDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const {
 	qDebug() << "createEditor enter";
@@ -37,6 +45,8 @@ void LineEditDelegate::updateEditorGeometry(QWidget* editor, const QStyleOptionV
 void LineEditDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {
     int rowPos = index.model()->rowCount() - 1;
 
+    qDebug() << "paint event called";
+    qDebug() << "activeRecycle = " << activeRecycle;
     if (!index.isValid()) return ;
     if (index.row() < rowPos && index.column() == 1) {
 		QPointF iconPoint(option.rect.left(), option.rect.top() + 8);
@@ -45,12 +55,38 @@ void LineEditDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
 		painter->drawPixmap(iconPoint, papersPixmap.scaled(15, 15, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 		painter->drawText(textPoint, index.model()->data(index, Qt::EditRole).toString());
     }
-    if (index.row() < rowPos && index.column() == 2 && activeRecycle) {
-        QPointF iconPoint(option.rect.left() + 2, option.rect.top() + 8);
+    /*if (index.row() < rowPos && index.column() == 2 && activeRecycle == false && option.state) {
+        qDebug() << "POINTRECT ERASE step";
+        QModelIndex tmpIndex = index.model()->index(index.row(), 2);
+        QRect pointRect = this->tableView->visualRect(tmpIndex);
 
-        painter->drawPixmap(iconPoint, recyleBinPixmap.scaled(15, 15, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+        painter->eraseRect(pointRect);
+        //painter->fillRect(pointRect, Qt::color0);
+        painter->save();
+        painter->restore();
+    }
+    if (index.row() < rowPos && activeRecycle == true && index.column() == 2) {
+        qDebug() << "POINTRECT DRAW step";
+        QModelIndex tmpIndex = index.model()->index(index.row(), 2);
+        QRect pointRect = this->tableView->visualRect(tmpIndex);
+        QPointF iconPoint(pointRect.left() + 2, pointRect.top() + 8);
+
+        painter->drawPixmap(iconPoint, recycleBinPixmap.scaled(15, 15, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+        painter->save();
+        painter->restore();
+    } else QItemDelegate::paint(painter, option, index);*/
+    if (index.row() < rowPos && index.column() == 2) {
+        qDebug() << "QPUSHBUTTON event called";
+
+        recycleBinButton->setGeometry(option.rect.left() + 2, option.rect.top() + 4, 16, 25);
+        //recycleBinButton->setEnabled(activeRecycle);
+        //recycleBinButton->setVisible(activeRecycle);
+        this->tableView->setIndexWidget(index, recycleBinButton);
+        //painter->restore();
     }
     else QItemDelegate::paint(painter, option, index);
+    //painter->save();
+    //painter->restore();
 }
 
 void LineEditDelegate::setTableView(QTableView* tableView) { this->tableView = tableView; }
@@ -78,4 +114,9 @@ void LineEditDelegate::setEditorData(QWidget* editor, const QModelIndex& index) 
     }
 }
 
-LineEditDelegate::~LineEditDelegate() { if (label) delete label; }
+QPushButton* LineEditDelegate::getRecycleBinButton() { return recycleBinButton; }
+
+LineEditDelegate::~LineEditDelegate() {
+    if (label) delete label;
+    if (recycleBinButton) delete recycleBinButton;
+}
