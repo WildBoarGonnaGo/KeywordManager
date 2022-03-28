@@ -23,7 +23,7 @@ class MaskTableModel : public QAbstractTableModel {
     QPixmap documentExportPixmap;
 	DrawItemDelegate* delegate;
 	LineEditDelegate* lineEditDelegate;
-    QTableView* view;
+	QTableView* view;
 	int columns;
 	int boundSave;
 	static const QVector<Qt::GlobalColor> colorVector;
@@ -45,12 +45,13 @@ public:
 	bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
     bool eventFilter(QObject* watched, QEvent* event) override;
+	void setCheckTotalState(const bool& state);
 private:
     Qt::CheckState checkTotalState() const;
     void setButtonActive(QPushButton* button, const bool& activeState);
 public slots:
     void addNewList(const QString& dst);
-    void removeList(const QModelIndex& parent);
+	void removeList(const bool& state);
 	void openEditor();
     void showRecycle(const QModelIndex& parent);
     void hideRecycle();

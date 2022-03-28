@@ -2,17 +2,22 @@
 #include <QSize>
 #include <QHeaderView>
 #include <iostream>
+#include <QIcon>
 
 MVCTestWidget::MVCTestWidget(const QMap<QString, QVariant>& map, const QList<KeywordDataSet>& dataSet, QWidget *parent) :
-	QWidget(parent), _map(map), _list(dataSet), _model(new MaskTableModel(_map, _list)), _drawDelegate(new DrawItemDelegate()) {
-	setWindowTitle("MVC Test System");
+	QWidget(parent), _map(map), _list(dataSet), _model(new MaskTableModel(_map, _list)), _drawDelegate(new DrawItemDelegate()),
+	header(nullptr) {
+	setWindowTitle("Диспетчер списков ключевых слов");
+	setWindowIcon(QIcon(":/delegateTrain/abc_icon.png"));
     setMinimumSize(QSize(640, 480));
 
     QString styleSheet = "QHeaderView::section { border: 0px; border-bottom: 0px; }";
 
     _tableView = new QTableView(this);
-    _tableView->setMinimumSize(475, 480);
+	header = new ModelHeader(Qt::Horizontal, _tableView, _model);
+	_tableView->setMinimumSize(500, 480);
     _tableView->setShowGrid(false);
+	_tableView->setHorizontalHeader(header);
     _tableView->horizontalHeader()->setStyleSheet(styleSheet);
     _tableView->setModel(_model);
     _tableView->show();
@@ -25,22 +30,25 @@ MVCTestWidget::MVCTestWidget(const QMap<QString, QVariant>& map, const QList<Key
     _tableView->setMouseTracking(true);
     _drawDelegate->setTableView(_tableView);
 	_model->setLastRowDelegate(_drawDelegate);
-	std::cout << "_drawDelegate = " << std::hex << _drawDelegate << std::endl;
     _tableView->setItemDelegateForRow(_model->rowCount() - 1, _drawDelegate);
 	_model->setTableView(_tableView);
 	setVisible(true);
 }
 
 MVCTestWidget::MVCTestWidget(const QMap<QString, QVariant>& map, QList<KeywordDataSet>&& dataSet, QWidget *parent) :
-    QWidget(parent), _map(map), _list(dataSet), _model(new MaskTableModel(_map, _list)), _drawDelegate(new DrawItemDelegate()) {
-    setWindowTitle("MVC Test System");
+	QWidget(parent), _map(map), _list(dataSet), _model(new MaskTableModel(_map, _list)), _drawDelegate(new DrawItemDelegate()),
+	header(nullptr) {
+	setWindowTitle("Диспетчер списков ключевых слов");
+	setWindowIcon(QIcon(":/delegateTrain/abc_icon.png"));
     setMinimumSize(QSize(640, 480));
 
     QString styleSheet = "QHeaderView::section { border: 0px; border-bottom: 0px; }";
 
     _tableView = new QTableView(this);
-    _tableView->setMinimumSize(475, 480);
+	header = new ModelHeader(Qt::Horizontal, _tableView, _model);
+	_tableView->setMinimumSize(500, 480);
     _tableView->setShowGrid(false);
+	_tableView->setHorizontalHeader(header);
     _tableView->horizontalHeader()->setStyleSheet(styleSheet);
     _tableView->setModel(_model);
     _tableView->show();
@@ -53,21 +61,15 @@ MVCTestWidget::MVCTestWidget(const QMap<QString, QVariant>& map, QList<KeywordDa
     _tableView->setMouseTracking(true);
     _drawDelegate->setTableView(_tableView);
 	_model->setLastRowDelegate(_drawDelegate);
-	std::cout << "_drawDelegate->getLabel() = " << std::hex << _drawDelegate->getLabel() << std::endl;
     _tableView->setItemDelegateForRow(_model->rowCount() - 1, _drawDelegate);
 	_model->setTableView(_tableView);
-	std::cout << "_tableView->model() = " << std::hex <<_tableView->model() << std::endl;
 
     setVisible(true);
 }
 
+MaskTableModel* MVCTestWidget::getModel() { return _model; }
 
 MVCTestWidget::~MVCTestWidget() {
-    /*
-    QAbstractItemModel* _model;
-    QTableView* _tableView;
-    DrawItemDelegate* _drawDelegate;
-    */
     if (_model) delete _model;
     if (_tableView) delete _tableView;
     if (_drawDelegate) delete _drawDelegate;

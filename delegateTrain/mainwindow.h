@@ -3,6 +3,7 @@
 #include <QTableView>
 #include "drawitemdelegate.h"
 #include "lineeditdelegate.h"
+#include "modelheader.h"
 
 class MVCTestWidget : public QWidget {
 	Q_OBJECT
@@ -11,10 +12,12 @@ class MVCTestWidget : public QWidget {
 	MaskTableModel* _model;
 	QTableView* _tableView;
     DrawItemDelegate* _drawDelegate;
+	ModelHeader* header;
 public:
     MVCTestWidget(const QMap<QString, QVariant>& map = QMap<QString, QVariant>(),
                   const QList<KeywordDataSet>& dataSet = QList<KeywordDataSet>(), QWidget* parent = nullptr);
     MVCTestWidget(const QMap<QString, QVariant>& map = QMap<QString, QVariant>(),
                   QList<KeywordDataSet>&& dataSet = std::move(QList<KeywordDataSet>()), QWidget* parent = nullptr);
     ~MVCTestWidget();
+	MaskTableModel* getModel();
 };

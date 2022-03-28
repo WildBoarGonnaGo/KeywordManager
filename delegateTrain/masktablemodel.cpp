@@ -5,6 +5,7 @@
 #include <QDebug>
 #include <iostream>
 #include <QMouseEvent>
+#include <ctime>
 
 const QVector<Qt::GlobalColor> MaskTableModel::colorVector =
     { Qt::white, Qt::black, Qt::red, Qt::darkRed, Qt::green,
@@ -56,15 +57,10 @@ QVariant MaskTableModel::data(const QModelIndex &index, int role) const {
             return QPixmap::fromImage(dataSetList.back().getPlusImage())
 					.scaled(15 ,15, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 		}
-        if (index.column() == 2 && index.row() != rowCount() - 1) return QPixmap::fromImage(dataSetList[index.row()].getRecycleBinImage())
-                .scaled(15, 15, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-        if (index.column() == 3 && index.row() != rowCount() - 1) return QPixmap::fromImage(dataSetList[index.row()].getUpImage())
-                .scaled(15, 15, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 	}
 	if (role == Qt::CheckStateRole) {
-        if (index.row() != rowCount() - 1 && !index.column()) {
-            if (dataSetList[index.row()].getCheckState()) return Qt::Unchecked;
-            else return Qt::Checked;
+		if (index.row() < rowCount() - 1 && !index.column()) {
+			return static_cast<Qt::CheckState>(dataSetList[index.row()].getCheckState());
         }
 	}
 	return QVariant();
@@ -72,7 +68,7 @@ QVariant MaskTableModel::data(const QModelIndex &index, int role) const {
 
 QVariant MaskTableModel::headerData(int section, Qt::Orientation orientation, int role) const {
     if (orientation == Qt::Horizontal) {
-        if (role == Qt::CheckStateRole) return checkTotalState();
+		if (!section && role == Qt::CheckStateRole)	return checkTotalState();
         if (role == Qt::DisplayRole) {
             if (section == 1) return QString("Списки ключевых слов");
         }
@@ -86,29 +82,36 @@ QVariant MaskTableModel::headerData(int section, Qt::Orientation orientation, in
 
 Qt::ItemFlags MaskTableModel::flags(const QModelIndex &index) const {
 
-    //const KeywordDataSet tmpSet = dataSetList[index.row()].get
-
     if (!index.isValid()) return Qt::ItemIsEnabled;
     if (index.row() == rowCount() - 1) return QAbstractItemModel::flags(index) | Qt::ItemIsSelectable;
-    if (index.row() < rowCount() - 1 && index.column() != 1) return QAbstractItemModel::flags(index) | Qt::ItemIsSelectable;
+	if (index.row() < rowCount() - 1 && index.column() > 1) return QAbstractItemModel::flags(index) | Qt::ItemIsSelectable;
     if (index.row() < rowCount() - 1 && !index.column()) return QAbstractItemModel::flags(index) | Qt::ItemIsUserCheckable;
-    //if (index.row() < rowCount() - 1 && dataSetList[index.row()].getLineEditDelegate()->getActiveRecycle())
 	return QAbstractItemModel::flags(index) | Qt::ItemIsEditable;
 }
 
 bool MaskTableModel::setData(const QModelIndex &index, const QVariant& value, int role) {
     KeywordDataSet someSet;
     if (!index.isValid()) return false;
-	if (index.isValid() && role == Qt::EditRole) {
+	if (role == Qt::EditRole) {
 		dataSetList[index.row()].setData(value.toString());
 		emit dataChanged(index, index, {role});
 		return true;
 	}
-    return true;
+	if (role == Qt::CheckStateRole) {
+		if (static_cast<Qt::CheckState>(value.toInt()) == Qt::Checked) {
+			dataSetList[index.row()].setCheckState(2);
+			return true;
+		}
+		else {
+			dataSetList[index.row()].setCheckState(0);
+			return true;
+		}
+	}
+	return false;
 }
 
 Qt::CheckState MaskTableModel::checkTotalState() const {
-    for (int i = 0; i < dataSetList.size() - 1; ++i) {
+	for (int i = 0; i < rowCount() - 1; ++i) {
         if (!dataSetList[i].getCheckState()) return Qt::Unchecked;
     }
     return Qt::Checked;
@@ -139,19 +142,23 @@ void MaskTableModel::addNewList(const QString& dst) {
 	insertRows(bound, 1);
     connect(this->view, SIGNAL(entered(QModelIndex)), this, SLOT(showRecycle(QModelIndex)));
     connect(this->view, SIGNAL(viewportEntered()), this, SLOT(hideRecycle()));
-    connect(dataSetList[bound].getLineEditDelegate()->getRecycleBinButton(), SIGNAL(clicked(bool)), this, SLOT(removeList()));
+	connect(dataSetList[bound].getLineEditDelegate()->getRecycleBinButton(), SIGNAL(clicked(bool)), this, SLOT(removeList(bool)));
+	dataSetList[bound].getLineEditDelegate()->getRecycleBinButton()->installEventFilter(this);
 }
 
 const QList<KeywordDataSet>& MaskTableModel::getDataSetList() const { return this->dataSetList; }
 
 
 bool MaskTableModel::insertRows(int row, int count, const QModelIndex &parent) {
+	qsrand(time(0x0));
+	int index = qrand() % colorVector.size();
+
 	beginInsertRows(QModelIndex(), row, row + count - 1);
 
 	int bound = row + count;
 	for (int i = row; i < bound; ++i)
 		dataSetList.insert(i, KeywordDataSet(lineEditDelegate->getData()));
-	dataSetList[bound].getLineEditDelegate()->setTableView(this->view);
+	dataSetList[row].getLineEditDelegate()->setColor(colorVector[index]);
     for (int i = 0; i < rowCount() - 1; ++i) {
 		this->view->setItemDelegateForRow(i, dataSetList[i].getLineEditDelegate());
         dataSetList[i].getLineEditDelegate()->setTableView(this->view);
@@ -162,12 +169,18 @@ bool MaskTableModel::insertRows(int row, int count, const QModelIndex &parent) {
 }
 
 bool MaskTableModel::removeRows(int row, int count, const QModelIndex &parent) {
-    if (!parent.isValid()) return false;
-    beginRemoveRows(QModelIndex(), row, row + count - 1);
-    QList<KeywordDataSet>::const_iterator it = dataSetList.begin();
-    for (int i = 0; i < row + count - 1; ++i) ++it;
-    dataSetList.erase(it);
+	if (!parent.isValid()) return false;
+	beginRemoveRows(QModelIndex(), row, row + count - 1);
+	QList<KeywordDataSet>::iterator it = dataSetList.begin();
+	for (int i = 0; i < row + count - 1; ++i) ++it;
+	dataSetList.erase(it);
+	this->view->setItemDelegateForRow(rowCount() - 1, delegate);
+	for (int i = 0; i < rowCount() - 1; ++i) {
+		this->view->setItemDelegateForRow(i, dataSetList[i].getLineEditDelegate());
+		dataSetList[i].getLineEditDelegate()->setTableView(this->view);
+	}
     endRemoveRows();
+	return true;
 }
 
 void MaskTableModel::showRecycle(const QModelIndex& parent) {
@@ -192,8 +205,6 @@ bool MaskTableModel::eventFilter(QObject* watched, QEvent* event) {
         if (event->type() == QEvent::MouseMove) {
             QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
             QModelIndex mouseIndex = this->view->indexAt(mouseEvent->pos());
-            qDebug() << "mouseIndex.row() = " << mouseIndex.row();
-            qDebug() << "mouseIndex.column() = " << mouseIndex.column();
             if (mouseIndex.isValid()) {
                 for (int i = 0; i < rowCount(); ++i) {
                     if (i == rowCount() - 1) break;
@@ -205,20 +216,38 @@ bool MaskTableModel::eventFilter(QObject* watched, QEvent* event) {
                     QPushButton* tmpButton = dataSetList[i].getLineEditDelegate()->getRecycleBinButton();
                     setButtonActive(tmpButton, false);
                 }
-            }
+			}
         }
     }
     return QAbstractTableModel::eventFilter(watched, event);
 }
 
 void MaskTableModel::setButtonActive(QPushButton* button, const bool& activeState) {
-    qDebug() << "setButtonAcrive::activeState" << activeState;
     button->setEnabled(activeState);
     button->setVisible(activeState);
     if (activeState) button->show();
     else button->hide();
 }
 
-void MaskTableModel::removeList(const QModelIndex& parent) {
-
+void MaskTableModel::setCheckTotalState(const bool& state) {
+	Qt::CheckState totalState = (state) ? Qt::Checked : Qt::Unchecked;
+	for (int i = 0; i < rowCount() - 1; ++i) {
+		QModelIndex forIndex = this->index(i, 0);
+		setData(forIndex, totalState, Qt::CheckStateRole);
+	}
+	emit dataChanged(index(0, 0), index(rowCount() - 1, 0), {Qt::CheckStateRole});
 }
+
+void MaskTableModel::removeList(const bool& state) {
+	QPushButton* buttonSender = qobject_cast<QPushButton*>(sender());
+	int row;
+	for (row = 0; row < rowCount() - 1; ++row) {
+		QPushButton* tmpButton = dataSetList[row].getLineEditDelegate()->getRecycleBinButton();
+		if (tmpButton == buttonSender) {
+			QModelIndex rowRemoveIndex  = this->index(0, 0);
+			removeRows(row, 1, rowRemoveIndex);
+			break ;
+		}
+	}
+}
+

@@ -20,6 +20,7 @@ class LineEditDelegate : public QItemDelegate {
     QPushButton* recycleBinButton;
 	QString data;
     bool activeRecycle;
+	Qt::GlobalColor color;
 public:
 	LineEditDelegate(QObject *parent = nullptr);
     QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
@@ -30,6 +31,8 @@ public:
 	void setTableView(QTableView* tableView);
     void setActiveRecycle(const bool& activeRecycle);
     void setDataSet(KeywordDataSet* dataSet);
+	void setColor(const Qt::GlobalColor& color);
+	const Qt::GlobalColor& getColor() const;
     const KeywordDataSet* getDataSet() const;
     const bool& getActiveRecycle() const;
 	const QString& getData() const;

@@ -13,13 +13,15 @@ void DrawItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
     if (!index.isValid() || !view) return;
     const QAbstractItemModel* model = index.model();
 
+
     if (index.row() == model->rowCount() - 1 && index.column() == 1) {
         label->setTextFormat(Qt::RichText);
         label->setTextInteractionFlags(Qt::TextBrowserInteraction);
 		label->setOpenExternalLinks(false);
         label->setText(index.data().toString());
         view->setIndexWidget(index, label);
-    } else QStyledItemDelegate::paint(painter, option, index);
+	}
+	else QStyledItemDelegate::paint(painter, option, index);
 }
 
 void DrawItemDelegate::setTableView(QTableView *view) { this->view = view; }

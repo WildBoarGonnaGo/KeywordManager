@@ -6,5 +6,6 @@
         <file>up_document.png</file>
         <file>document_export.png</file>
         <file>document_import.png</file>
+        <file>abc_icon.png</file>
     </qresource>
 </RCC>

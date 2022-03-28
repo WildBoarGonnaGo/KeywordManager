@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(delegateTrain VERSION 0.1 LANGUAGES CXX)
+project(delegateTrain VERSION 0.6 LANGUAGES CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -28,6 +28,8 @@ set(PROJECT_SOURCES
         drawitemdelegate.h
         drawitemdelegate.cpp
         img/resource.qrc
+		modelheader.cpp
+		modelheader.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
