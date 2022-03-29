@@ -12,7 +12,8 @@ const bool& ModelHeader::getCheckState() const { return checkState; }
 void ModelHeader::setCheckState(const bool& checkState) {
 	if (this->checkState != checkState) {
 		this->checkState = checkState;
-		model->setCheckTotalState(checkState);
+        if (checkState == true || (!checkState && model->checkTotalState()))
+            model->setCheckTotalState(checkState);
 		redrawCheckBox();
 	}
 }

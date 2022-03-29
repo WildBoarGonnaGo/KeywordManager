@@ -1,6 +1,5 @@
 #include "mainwindow.h"
 #include <QSize>
-#include <QHeaderView>
 #include <iostream>
 #include <QIcon>
 
@@ -18,7 +17,10 @@ MVCTestWidget::MVCTestWidget(const QMap<QString, QVariant>& map, const QList<Key
 	_tableView->setMinimumSize(500, 480);
     _tableView->setShowGrid(false);
 	_tableView->setHorizontalHeader(header);
+    _model->setModelHeader(header);
     _tableView->horizontalHeader()->setStyleSheet(styleSheet);
+    _tableView->horizontalHeader()->setDefaultAlignment(Qt::AlignLeft);
+    _tableView->setSortingEnabled(true);
     _tableView->setModel(_model);
     _tableView->show();
     _tableView->setRowHeight(0, 25);
@@ -46,18 +48,22 @@ MVCTestWidget::MVCTestWidget(const QMap<QString, QVariant>& map, QList<KeywordDa
 
     _tableView = new QTableView(this);
 	header = new ModelHeader(Qt::Horizontal, _tableView, _model);
+    _model->setModelHeader(header);
 	_tableView->setMinimumSize(500, 480);
     _tableView->setShowGrid(false);
 	_tableView->setHorizontalHeader(header);
     _tableView->horizontalHeader()->setStyleSheet(styleSheet);
+    _tableView->horizontalHeader()->setDefaultAlignment(Qt::AlignLeft);
+    _tableView->setSortingEnabled(true);
+    _tableView->horizontalHeader()->setSortIndicatorShown(true);
     _tableView->setModel(_model);
     _tableView->show();
     _tableView->verticalHeader()->setVisible(false);
-    _tableView->setRowHeight(0, 25);
-    _tableView->setColumnWidth(0, 25);
+    _tableView->setRowHeight(0, 30);
+    _tableView->setColumnWidth(0, 30);
     _tableView->setColumnWidth(1, 400);
-    _tableView->setColumnWidth(2, 25);
-    _tableView->setColumnWidth(3, 25);
+    _tableView->setColumnWidth(2, 30);
+    _tableView->setColumnWidth(3, 30);
     _tableView->setMouseTracking(true);
     _drawDelegate->setTableView(_tableView);
 	_model->setLastRowDelegate(_drawDelegate);

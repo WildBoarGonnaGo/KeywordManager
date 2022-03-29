@@ -6,6 +6,8 @@
 #include <iostream>
 #include <QMouseEvent>
 #include <ctime>
+#include <cstdlib>
+#include "modelheader.h"
 
 const QVector<Qt::GlobalColor> MaskTableModel::colorVector =
     { Qt::white, Qt::black, Qt::red, Qt::darkRed, Qt::green,
@@ -150,8 +152,8 @@ const QList<KeywordDataSet>& MaskTableModel::getDataSetList() const { return thi
 
 
 bool MaskTableModel::insertRows(int row, int count, const QModelIndex &parent) {
-	qsrand(time(0x0));
-	int index = qrand() % colorVector.size();
+    srand(time(0x0));
+    int index = rand() % colorVector.size();
 
 	beginInsertRows(QModelIndex(), row, row + count - 1);
 
@@ -171,7 +173,7 @@ bool MaskTableModel::insertRows(int row, int count, const QModelIndex &parent) {
 bool MaskTableModel::removeRows(int row, int count, const QModelIndex &parent) {
 	if (!parent.isValid()) return false;
 	beginRemoveRows(QModelIndex(), row, row + count - 1);
-	QList<KeywordDataSet>::iterator it = dataSetList.begin();
+    QList<KeywordDataSet>::iterator it = dataSetList.begin();
 	for (int i = 0; i < row + count - 1; ++i) ++it;
 	dataSetList.erase(it);
 	this->view->setItemDelegateForRow(rowCount() - 1, delegate);
@@ -218,6 +220,10 @@ bool MaskTableModel::eventFilter(QObject* watched, QEvent* event) {
                 }
 			}
         }
+        if (header) {
+            bool newHeaderCheckState = (checkTotalState()) ? true : false;
+            header->setCheckState(newHeaderCheckState);
+        }
     }
     return QAbstractTableModel::eventFilter(watched, event);
 }
@@ -237,6 +243,10 @@ void MaskTableModel::setCheckTotalState(const bool& state) {
 	}
 	emit dataChanged(index(0, 0), index(rowCount() - 1, 0), {Qt::CheckStateRole});
 }
+
+ModelHeader* MaskTableModel::getHeader() const { return header; }
+
+void MaskTableModel::setModelHeader(ModelHeader* header) { this->header = header; }
 
 void MaskTableModel::removeList(const bool& state) {
 	QPushButton* buttonSender = qobject_cast<QPushButton*>(sender());

@@ -13,6 +13,8 @@
 #include <QVector>
 #include <QEvent>
 
+class ModelHeader;
+
 class MaskTableModel : public QAbstractTableModel {
 
 	Q_OBJECT
@@ -24,6 +26,7 @@ class MaskTableModel : public QAbstractTableModel {
 	DrawItemDelegate* delegate;
 	LineEditDelegate* lineEditDelegate;
 	QTableView* view;
+    ModelHeader* header;
 	int columns;
 	int boundSave;
 	static const QVector<Qt::GlobalColor> colorVector;
@@ -46,8 +49,10 @@ public:
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
     bool eventFilter(QObject* watched, QEvent* event) override;
 	void setCheckTotalState(const bool& state);
-private:
+    ModelHeader* getHeader() const;
+    void setModelHeader(ModelHeader* header);
     Qt::CheckState checkTotalState() const;
+private:
     void setButtonActive(QPushButton* button, const bool& activeState);
 public slots:
     void addNewList(const QString& dst);
